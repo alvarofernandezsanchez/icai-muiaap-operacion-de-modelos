@@ -17,6 +17,7 @@ FEATURES = [
     "pH",
     "sulphates",
     "alcohol",
+    "Id"
 ]
 TARGET = "quality"
 RANDOM_STATE = 42
