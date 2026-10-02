@@ -1,0 +1,28 @@
+{
+  "schema-version" : "v1.0",
+  "model-version" : "wine-quality-rf-v1",
+  "preprocess-version" : "v1.0",
+  "features_name" : ["fixed_acidity",
+  "volatile_acidity",
+  "citric_acid",
+  "residual_sugar",
+  "chlorides",
+  "free_sulfur_dioxide",
+  "total_sulfur_dioxide",
+  "density",
+  "ph",
+  "sulphates",
+  "alcohol"],
+  "output_labels" : ["acceptable", "excelent", "needs_review"],
+  "estimator_type" : { 
+        "RandomForestClassifier": {
+            "class_weight": "balanced_subsample",
+            "max_depth": 8,
+            "min_samples_leaf": 2,
+            "n_estimators": 200,
+            "random_state": 42
+        }
+    }
+
+
+}
