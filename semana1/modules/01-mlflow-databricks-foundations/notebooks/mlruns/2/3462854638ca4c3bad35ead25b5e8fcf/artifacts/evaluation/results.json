@@ -1,0 +1,32 @@
+[
+  {
+    "question": "\u00bfQu\u00e9 objeto agrupa varios runs?",
+    "must_include": "experimento",
+    "answer": "Ruta: mlflow. Un experimento agrupa runs con par\u00e1metros, m\u00e9tricas y artefactos.",
+    "passed": true
+  },
+  {
+    "question": "\u00bfPuedo guardar una contrase\u00f1a como tag?",
+    "must_include": "secretos",
+    "answer": "Ruta: security. No registres secretos en par\u00e1metros, tags ni artefactos.",
+    "passed": true
+  },
+  {
+    "question": "\u00bfQu\u00e9 debo cuidar en producci\u00f3n?",
+    "must_include": "contratos",
+    "answer": "Ruta: production. En producci\u00f3n importan contratos, versionado y monitorizaci\u00f3n.",
+    "passed": true
+  },
+  {
+    "question": "\u00bfSe puede guardar en Mlflow un token secreto?",
+    "must_include": "secretos",
+    "answer": "Ruta: security. No registres secretos en par\u00e1metros, tags ni artefactos.",
+    "passed": true
+  },
+  {
+    "question": "\u00bfQu\u00e9 tengo que tener en cuenta al desplegar una API en produccion?",
+    "must_include": "monitorizaci\u00f3n",
+    "answer": "Ruta: production. En producci\u00f3n importan contratos, versionado y monitorizaci\u00f3n.",
+    "passed": true
+  }
+]
