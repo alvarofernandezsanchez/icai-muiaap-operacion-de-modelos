@@ -1,0 +1,19 @@
+[project]
+name = "clase01"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Alvaro Fernandez Sanchez", email = "alvaroarquero1@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "streamlit>=1.61.1",
+]
+
+[project.scripts]
+clase01 = "clase01:main"
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
