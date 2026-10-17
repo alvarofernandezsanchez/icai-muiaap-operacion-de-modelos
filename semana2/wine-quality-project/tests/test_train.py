@@ -14,6 +14,7 @@ def test_training_pipeline() -> None:
     assert dataset.shape == (1143, 13)
     assert sorted(dataset["quality"].unique().tolist()) == [3, 4, 5, 6, 7, 8]
     assert "Id" not in FEATURES
+    assert "Type" not in FEATURES
     assert len(FEATURES) == 11
 
     metrics = train_and_evaluate(DATASET_PATH)
