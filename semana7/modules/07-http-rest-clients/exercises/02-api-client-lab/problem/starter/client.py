@@ -24,7 +24,52 @@ def request_prediction(
     """Envía una predicción y devuelve un objeto JSON de respuesta."""
     # TODO 3: selecciona `session` o `requests` y envía POST con `json=`,
     # `Accept` y `timeout`. Comprueba los argumentos con test_client.py.
+    cliente = session if session is not None else requests
+
+    url = f"{base_url.rstrip('/')}/v1/predictions"
+
+    try:
+        response = cliente.post(
+            url,
+            json=payload,
+            headers={"Accept": "application/json"},
+            timeout=timeout,
+        )
     # TODO 4: llama a `raise_for_status()` y conserva el status de HTTPError.
+        response.raise_for_status()
+
+    except requests.exceptions.HTTPError as error:
+        status = (
+            error.response.status_code
+            if error.response is not None
+            else None
+        )
+        raise PredictionClientError(
+            "Error HTTP al solicitar la predicción",
+            status_code=status,
+        ) from error
+    
     # TODO 5: traduce Timeout y ConnectionError a PredictionClientError.
+    except requests.exceptions.Timeout as error:
+        raise PredictionClientError(
+            "Tiempo de espera agotado"
+        ) from error
+
+    except requests.exceptions.ConnectionError as error:
+        raise PredictionClientError(
+            "No se pudo conectar con la API"
+        ) from error
     # TODO 6: convierte la respuesta con `.json()` y exige un diccionario.
-    raise NotImplementedError("Completa los TODO 3–6 del laboratorio")
+    try:
+        resultado = response.json()
+    except ValueError as error:
+        raise PredictionClientError(
+            "La respuesta no contiene un JSON válido"
+        ) from error
+
+    if not isinstance(resultado, dict):
+        raise PredictionClientError(
+            "La respuesta JSON debe ser un objeto"
+        )
+
+    return resultado
