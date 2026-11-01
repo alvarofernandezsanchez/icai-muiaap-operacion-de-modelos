@@ -55,13 +55,54 @@ class HttpInferenceGateway:
 
         # TODO S7.1: envia POST a self._prediction_url con json={"features": ...},
         # Accept application/json y self._timeout. Compruebalo con el test de llamada.
+        self.last_request_id = None
+
+        try:
+            response = self._session.post(
+                self._prediction_url,
+                json={"features": dict(values)},
+                headers={"Accept": "application/json"},
+                timeout=self._timeout,
+            )
+
         # TODO S7.2: traduce Timeout, ConnectionError y RequestException a los
         # errores de dominio que ya entiende PredictionController.
+        except requests.Timeout as error:
+            raise InferenceTimeoutError(
+                "La inferencia ha superado el tiempo permitido"
+            ) from error
+        except requests.ConnectionError as error:
+            raise ArtifactUnavailableError(
+                "No se pudo conectar con el backend"
+            ) from error
+        except requests.RequestException as error:
+            raise BackendInferenceError(
+                "No se pudo completar la solicitud HTTP"
+            ) from error
+
         # TODO S7.3: lee un objeto JSON, conserva request_id y diferencia 422/503
         # del resto de errores HTTP.
+        self.last_request_id = self._header_request_id(response)
+        status = response.status_code
+
+        if status == 422:
+            raise InputContractError("La entrada no cumple el contrato")
+        if status == 503:
+            raise ArtifactUnavailableError("El backend no esta disponible")
+        if not 200 <= status < 300:
+            raise BackendInferenceError(f"Error HTTP {status}")
+
+        body = self._read_object(response)
+        self.last_request_id = self._request_id(response, body)
+
         # TODO S7.4: valida body["prediction"] como PredictionPayload; un dict sin
         # validar no satisface el contrato de salida.
-        raise NotImplementedError("Completa los TODO S7.1-S7.4")
+        try:
+            return PredictionPayload.model_validate(body["prediction"])
+        except (KeyError, TypeError, ValueError, ValidationError) as error:
+            raise BackendInferenceError(
+                "La respuesta del backend no cumple el contrato"
+            ) from error
 
     @staticmethod
     def _read_object(response: Any) -> dict[str, Any]:
@@ -69,14 +110,27 @@ class HttpInferenceGateway:
 
         # TODO S7.3: usa response.json(), traduce ValueError y rechaza listas u
         # otros valores que no sean un objeto JSON.
-        raise NotImplementedError("Completa el lector JSON del TODO S7.3")
+        try:
+            body = response.json()
+        except ValueError as error:
+            raise BackendInferenceError(
+                "El backend ha devuelto un JSON no valido"
+            ) from error
+
+        if not isinstance(body, dict):
+            raise BackendInferenceError("La respuesta JSON debe ser un objeto")
+
+        return body
 
     @staticmethod
     def _request_id(response: Any, body: dict[str, Any]) -> str | None:
         """Obtiene request_id del cuerpo y usa la cabecera como alternativa."""
 
         # TODO S7.3: prioriza body["request_id"] y usa X-Request-Id como fallback.
-        raise NotImplementedError("Completa la trazabilidad del TODO S7.3")
+        request_id = body.get("request_id")
+        if isinstance(request_id, str) and request_id:
+            return request_id
+        return HttpInferenceGateway._header_request_id(response)
 
     @staticmethod
     def _header_request_id(response: Any) -> str | None:
