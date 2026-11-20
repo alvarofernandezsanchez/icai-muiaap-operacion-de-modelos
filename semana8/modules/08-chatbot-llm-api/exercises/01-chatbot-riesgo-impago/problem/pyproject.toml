@@ -3,7 +3,7 @@ name = "practica8"
 version = "0.1.0"
 description = "Practica 8: chatbot de riesgo con LLM (LiteLLM), FastAPI y un modelo joblib"
 dependencies = [
-    "fastapi",
+    "fastapi==0.115.12",
     "uvicorn",
     "pydantic",
     "scikit-learn",
